@@ -1,0 +1,114 @@
+<style>
+
+        @media only screen and (max-width: 600px) {
+            .invoice-box table tr.top table td {
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+
+            .invoice-box table tr.information table td {
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+        }
+
+
+        </style>
+    </head>
+
+    <body>
+        <div class="invoice-box">
+            <table cellpadding="15" cellspacing="0">
+                    @php
+                        $user_id = App\Sale::find($sale_id)->first()->user_id;
+                        $sale_info = App\Sale::find($sale_id)->first();
+                        $user_info = App\User::find($user_id)->first();
+                        $sale_details_info = App\Sale_details::where('sale_id', $sale_id)->get();
+                    @endphp
+                <tr>
+                    <td colspan="2">Amar Fish<br>
+                        Mirpur-10, Dhaka.<br>
+                        01820937110.
+                    </td>
+                    <td colspan="3">
+                        Invoice No: {{ $sale_id }}<br>
+                        Date: {{ \Carbon\Carbon::now()->format('d/m/Y')}}<br>
+                        Customer Name: {{ $user_info->name }}<br>
+                        Customer Email: {{ $user_info->email }}<br>
+                        Customer Mobile: 01515633578
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Payment Method
+                    </td>
+                    <td>
+                        @if ($sale_info->payment_method == 1)
+                            Cash In Delevery
+                        @endif
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Item
+                    </td>
+
+                    <td>
+                        Quantity
+                    </td>
+                    <td>
+                        Weight
+                    </td>
+
+                    <td>
+                        Price
+                    </td>
+                    <td>
+                        Total
+                    </td>
+                </tr>
+                @php
+                    $cart_subtotal = 0;
+                @endphp
+                @foreach ($sale_details_info as $item)
+                <tr class="item">
+                        <td>
+                            {{ App\Product::find($item->product_id)->product_title }}
+                        </td>
+
+                        <td>
+                            {{ $item->product_quantity }}
+                        </td>
+                        <td>
+                            {{ $item->size_id }} {{ App\Unit::find($item->unit_id)->unit_name }}
+                        </td>
+                        <td>
+                                ৳{{ App\Product::find($item->product_id)->sale_price }}.00
+                        </td>
+                        @php
+                            $item_subtotal = App\Product::find($item->product_id)->sale_price * $item->product_quantity * $item->size_id;
+                            $cart_subtotal += $item_subtotal;
+                        @endphp
+                        <td>
+                                ৳{{ $item_subtotal }}.00
+                        </td>
+                    </tr>
+                @endforeach
+
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="2">
+                       Grand Total: ৳{{ $cart_subtotal }}.00
+                    </td>
+                </tr>
+            </table>
+
+
+        </div>
+    </body>
